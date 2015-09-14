@@ -41,9 +41,28 @@ class PathSelector(bpy.types.Operator):
                 if v.select == True:
                     sel_vert.append(v)
 
-        # extract coordinate data from selected vertices
-        vertice_coordinates = [ [v.co.x,v.co.y,v.co.z] for v in sel_vert]
-        mess = json.dumps(vertice_coordinates,2)
+        # extract coordinate data from all vertices
+        all_vert = context.active_object.data.vertices
+        vertex_coordinates = [ [v.co.x,v.co.y,v.co.z] for v in all_vert]
+        vertex_normals = [[v.normal.x,v.normal.y,v.normal.z] for v in all_vert]
+
+        # extract selected edges 
+        selected_edges = []
+        if context.active_object.mode == "EDIT":
+            blender_mesh = bmesh.from_edit_mesh(context.active_object.data)
+            for v in blender_mesh.edges:
+                if v.select == True:
+                    selected_edges.append(v)
+        else:
+            blender_mesh = context.active_object.data
+            for v in blender_mesh.edges:
+                if v.select == True:
+                    selected_edges.append(v)
+
+        # extract vertex index data from selected edges
+        edges = [(e.vertices[0],e.vertices[1]) for e in selected_edges]
+        mess = {'edges':edges, 'vert_loc':vertex_coordinates, 'vert_norm':vertex_normals}
+        mess = json.dumps(mess)
         socket_connection.sendto(bytes(mess,'utf-8'),addr)
         
         return {'FINISHED'}            # this lets blender know the operator finished successfully.

@@ -1,7 +1,7 @@
 
-* TODO list SELECTED edges instead of vertices
+* DONE list SELECTED edges instead of vertices. This also selects the connected vertices.
 
-* TODO list of ALL vertices coordinates and a list of ALL vertices normal vectors
+* DONE list of SELECTED vertices coordinates and a list of SELECTED vertices normal vectors
 
 * TODO on the recieving end, resolve number of distinct paths from the set of selected edges. 
 
