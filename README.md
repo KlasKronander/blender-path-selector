@@ -1,5 +1,5 @@
 
-# Add-on for extracting robot path data from blender
+# Add-on for extracting path data from blender
 Blender is a fantastic machine with incredible mesh object navigation, selection and editing properties. This is an add-on for Blender which allows to export select information from blender models.
 
 ## Setup
@@ -27,4 +27,4 @@ Now that we have selected our desired frame of reference, let's select a few ver
 2. Make sure vertex-select is selected (hover over the symbols in the icon bar below the 3d window)
 3. Select the vertices you like by clicking on them. You can also use the circle or box select tools by pressing c or b on the keyboard.
 4. When you have fininshed your selection, press spacebar to bring up the searchable function browser. Type "Select path" and press enter.
-5. The coordinates of the selcted vertices in the selected frame of reference are now sent as a udp package on localhost, port 5005.
+5. A dialog will appear that allows you to enter an IP address and port. Once you press "OK", a udp package containing the selection information as a python dictionary will be sent to the provided IP port. 
