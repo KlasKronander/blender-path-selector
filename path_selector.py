@@ -1,3 +1,18 @@
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+
+
 bl_info = {
     "name": "Path selector",
     "category": "Object",
@@ -8,10 +23,6 @@ import bmesh
 import socket
 import json
 
-IP = '172.16.206.156'
-port = 5005
-addr = (IP, port)
-
 
 class PathSelector(bpy.types.Operator):
     # blender will use this as a tooltip for menu items and buttons.
@@ -20,7 +31,12 @@ class PathSelector(bpy.types.Operator):
     bl_idname = "object.path_selector"
     # display name in the interface.
     bl_label = "Select path"
-    # bl_options = {'REGISTER', 'UNDO'}  # enable undo for the operator
+    # bl_options = {'REGISTER', 'REDO'}  # enable undo for the operator
+    IP = bpy.props.StringProperty(name="Path server IP", default="localhost")
+    port = bpy.props.IntProperty(name="port", default=5005)
+
+    def invoke(self, context, event):
+        return context.window_manager.invoke_props_dialog(self)
 
     # execute() is called by blender when running the operator.
     def execute(self, context):
@@ -54,20 +70,22 @@ class PathSelector(bpy.types.Operator):
             for v in blender_mesh.edges:
                 if v.select is True:
                     selected_edges.append(v)
-            edges = [(e.verts[0].index, e.verts[1].index) for e in selected_edges]
+                    edges = [(e.verts[0].index, e.verts[1].index) for e in selected_edges]
         else:
             # if we are not in edit mode things are a bit easier
             blender_mesh = context.active_object.data
             for v in blender_mesh.edges:
                 if v.select is True:
                     selected_edges.append(v)
-            edges = [(e.vertices[0], e.vertices[1]) for e in selected_edges]
+                    edges = [(e.vertices[0], e.vertices[1]) for e in selected_edges]
 
         # extract vertex index data from selected edges
 
         mess = {'edges': edges, 'vert_loc': vertex_coordinates, 'vert_norm': vertex_normals}
         mess = json.dumps(mess)
+        addr = (self.IP, self.port)
         socket_connection.sendto(bytes(mess, "utf-8"), addr)
+        self.report({'INFO'}, "sent message to: "+self.IP+" port: "+str(self.port))
         # this lets blender know the operator finished successfully.
         return {'FINISHED'}
 
